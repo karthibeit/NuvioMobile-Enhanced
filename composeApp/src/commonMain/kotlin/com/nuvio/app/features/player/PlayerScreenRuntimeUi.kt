@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import com.nuvio.app.features.p2p.P2pStreamingState
@@ -104,6 +105,44 @@ internal fun PlayerScreenRuntime.RenderPlayerRuntimeUi() {
         }
     }
     val gestureCallbacks = rememberSurfaceGestureCallbacks()
+
+    // TV support (v1): let the platform activity forward remote keys to this
+    // player. Keys are only consumed while controls are hidden and no panel or
+    // modal is open; otherwise they fall through to Compose focus navigation.
+    DisposableEffect(Unit) {
+        TvPlayerKeyBridge.handler = { key ->
+            val panelOpen = playerControlsLocked ||
+                showSourcesPanel || showEpisodesPanel || showSubmitIntroModal ||
+                episodeStreamsPanelState.showStreams || showParentalGuide ||
+                showAudioModal || showSubtitleModal || showVideoSettingsModal ||
+                showQualityPanel || showLiveTvChannelsPanel
+            if (panelOpen || controlsVisible) {
+                false
+            } else {
+                when (key) {
+                    TvPlayerKey.TogglePlayback -> {
+                        togglePlayback()
+                        true
+                    }
+                    TvPlayerKey.SeekBack -> {
+                        seekBy(-PlayerDoubleTapSeekStepMs)
+                        true
+                    }
+                    TvPlayerKey.SeekForward -> {
+                        seekBy(PlayerDoubleTapSeekStepMs)
+                        true
+                    }
+                    TvPlayerKey.ShowControls -> {
+                        controlsVisible = true
+                        true
+                    }
+                }
+            }
+        }
+        onDispose {
+            TvPlayerKeyBridge.handler = null
+        }
+    }
 
     Box(
         modifier = Modifier
