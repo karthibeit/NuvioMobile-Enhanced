@@ -2,6 +2,8 @@ package com.nuvio.app.core.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,13 +29,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -443,9 +449,29 @@ internal fun Modifier.posterCardClickable(
 ): Modifier {
     if (onClick == null && onLongClick == null) return this
     val bounds = remember { mutableStateOf<Rect?>(null) }
+    // TV support: poster cards draw their own focus border. The shared
+    // indication alone was not visible on image cards in the v1 TV test
+    // (top menu navigated, Home rows showed no focus), so focus visibility
+    // for cards must not depend on the indication pipeline.
+    var isFocused by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
     return this
         .onGloballyPositioned { coordinates -> bounds.value = coordinates.unclippedBoundsInRoot() }
+        .onFocusChanged { focusState -> isFocused = focusState.isFocused }
+        .then(
+            if (isFocused) {
+                Modifier.border(
+                    width = 3.dp,
+                    color = Color.White,
+                    shape = RoundedCornerShape(zoomCornerRadius),
+                )
+            } else {
+                Modifier
+            },
+        )
         .combinedClickable(
+            interactionSource = interactionSource,
+            indication = TvFocusIndication,
             onClick = { onClick?.invoke() },
             onLongClick = onLongClick?.let { longClick ->
                 {
