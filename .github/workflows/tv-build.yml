@@ -49,7 +49,11 @@ jobs:
           fi
 
       - name: Build Full Release APK
-        run: ./gradlew :androidApp:assembleFullRelease --stacktrace
+        # TV builds skip R8 minification: two runs in a row were killed by a
+        # runner shutdown during minifyFullReleaseWithR8, and skipping it also
+        # avoids R8 breaking the reflection-heavy CloudStream runtime. The app
+        # honours this switch itself (nuvio.android.minify gradle property).
+        run: ./gradlew :androidApp:assembleFullRelease -Pnuvio.android.minify=false --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v7
