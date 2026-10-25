@@ -211,7 +211,6 @@ fun NuvioTheme(
         LocalNuvioThemeTokens provides tokens,
         LocalNuvioTypeScale provides NuvioTypeTokens,
         LocalRippleConfiguration provides NuvioRippleConfiguration,
-        LocalIndication provides TvFocusIndication,
         LocalOverscrollFactory provides null,
         LocalAppTheme provides appTheme,
         LocalAnimatedThemeVisuals provides animatedVisuals,
@@ -219,7 +218,14 @@ fun NuvioTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = NuvioTypography,
-            content = content,
-        )
+        ) {
+            // TV support: provide the focus indication *inside* MaterialTheme.
+            // Providing it outside was shadowed by Material's own defaults, so
+            // app content never received it (v1 test: top menu tinted by the
+            // Material ripple, poster rows showed no focus at all).
+            CompositionLocalProvider(LocalIndication provides TvFocusIndication) {
+                content()
+            }
+        }
     }
 }
