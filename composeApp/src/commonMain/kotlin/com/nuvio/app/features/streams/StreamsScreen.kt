@@ -45,6 +45,7 @@ import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.SearchOff
 import com.nuvio.app.core.ui.NuvioLoadingIndicator
+import com.nuvio.app.core.ui.TvFocusIndication
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -1041,7 +1042,7 @@ private fun FilterChip(
             )
             .combinedClickable(
                 interactionSource = interactionSource,
-                indication = null,
+                indication = TvFocusIndication,
                 onClick = onClick,
                 onLongClick = onLongClick,
             )
