@@ -1,5 +1,6 @@
 package com.nuvio.app.core.ui
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.LocalRippleConfiguration
@@ -210,6 +211,7 @@ fun NuvioTheme(
         LocalNuvioThemeTokens provides tokens,
         LocalNuvioTypeScale provides NuvioTypeTokens,
         LocalRippleConfiguration provides NuvioRippleConfiguration,
+        LocalIndication provides TvFocusIndication,
         LocalOverscrollFactory provides null,
         LocalAppTheme provides appTheme,
         LocalAnimatedThemeVisuals provides animatedVisuals,
