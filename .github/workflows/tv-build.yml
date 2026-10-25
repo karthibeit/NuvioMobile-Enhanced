@@ -16,7 +16,10 @@ permissions:
 jobs:
   build:
     name: Build Full Release APK (TV)
-    runs-on: ubuntu-latest
+    # ubuntu-22.04 on purpose: three straight runs on ubuntu-latest were
+    # killed by runner shutdown signals mid-build (during R8, then during
+    # packaging) with the code compiling cleanly — trying the other pool.
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out
         uses: actions/checkout@v6
