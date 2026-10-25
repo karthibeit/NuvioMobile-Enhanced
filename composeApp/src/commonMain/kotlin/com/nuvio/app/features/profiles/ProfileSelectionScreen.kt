@@ -59,6 +59,7 @@ import coil3.compose.AsyncImage
 import com.nuvio.app.core.auth.AuthRepository
 import com.nuvio.app.core.auth.AuthState
 import com.nuvio.app.core.ui.ProfileMeshBackground
+import com.nuvio.app.core.ui.TvFocusIndication
 import com.nuvio.app.features.home.components.CollectionCardRemoteImage
 import com.nuvio.app.features.settings.AppLanguage
 import com.nuvio.app.features.settings.ThemeSettingsRepository
@@ -374,7 +375,7 @@ private fun ProfileAvatarCard(
             .clip(RoundedCornerShape(20.dp))
             .clickable(
                 interactionSource = interactionSource,
-                indication = null,
+                indication = TvFocusIndication,
                 onClick = onClick,
             )
             .padding(8.dp),
@@ -524,7 +525,7 @@ private fun AddProfileCard(
             .clip(RoundedCornerShape(20.dp))
             .clickable(
                 interactionSource = interactionSource,
-                indication = null,
+                indication = TvFocusIndication,
                 onClick = onClick,
             )
             .padding(8.dp),
