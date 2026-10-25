@@ -72,6 +72,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.nuvio.app.core.ui.NuvioTokens
+import com.nuvio.app.core.ui.TvFocusIndication
 import com.nuvio.app.core.ui.nuvio
 import com.nuvio.app.features.home.components.CollectionCardRemoteImage
 import com.nuvio.app.isIos
@@ -205,7 +206,7 @@ fun ProfileSwitcherTab(
             .onGloballyPositioned { triggerCoordinates = it }
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = null,
+                indication = TvFocusIndication,
                 onClick = onClick,
             )
             .pointerInput(profiles) {
@@ -557,7 +558,7 @@ private fun PopupAddProfileBubble(
             .clip(tokens.shapes.compactCard)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = null,
+                indication = TvFocusIndication,
                 onClick = onClick,
             )
             .padding(NuvioTokens.Space.s4),
@@ -651,7 +652,7 @@ private fun PopupProfileBubble(
             .clip(tokens.shapes.compactCard)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = null,
+                indication = TvFocusIndication,
                 onClick = onClick,
             )
             .padding(NuvioTokens.Space.s4),
