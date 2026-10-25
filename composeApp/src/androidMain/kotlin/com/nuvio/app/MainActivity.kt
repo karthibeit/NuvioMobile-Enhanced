@@ -2,6 +2,7 @@ package com.nuvio.app
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.view.KeyEvent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -40,6 +41,8 @@ import com.nuvio.app.features.mdblist.MdbListSettingsStorage
 import com.nuvio.app.features.notifications.EpisodeReleaseNotificationPlatform
 import com.nuvio.app.features.notifications.EpisodeReleaseNotificationsStorage
 import com.nuvio.app.features.player.PlayerSettingsStorage
+import com.nuvio.app.features.player.TvPlayerKey
+import com.nuvio.app.features.player.TvPlayerKeyBridge
 import com.nuvio.app.features.player.PlayerTrackPreferenceStorage
 import com.nuvio.app.features.player.ExternalPlayerPlatform
 import com.nuvio.app.features.player.SubtitleFileCache
@@ -170,6 +173,45 @@ open class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleIncomingAppIntent(intent)
+    }
+
+    /**
+     * TV support (v1): forward remote keys to the player while it is on
+     * screen. The player bridge consumes a key only when it acted on it
+     * (controls hidden, no panel open); anything else falls through to the
+     * normal Compose focus system untouched.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+            val handler = TvPlayerKeyBridge.handler
+            if (handler != null) {
+                val key = when (event.keyCode) {
+                    KeyEvent.KEYCODE_DPAD_CENTER,
+                    KeyEvent.KEYCODE_ENTER,
+                    KeyEvent.KEYCODE_NUMPAD_ENTER,
+                    KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+                    -> TvPlayerKey.TogglePlayback
+
+                    KeyEvent.KEYCODE_DPAD_LEFT,
+                    KeyEvent.KEYCODE_MEDIA_REWIND,
+                    -> TvPlayerKey.SeekBack
+
+                    KeyEvent.KEYCODE_DPAD_RIGHT,
+                    KeyEvent.KEYCODE_MEDIA_FAST_FORWARD,
+                    -> TvPlayerKey.SeekForward
+
+                    KeyEvent.KEYCODE_DPAD_UP,
+                    KeyEvent.KEYCODE_DPAD_DOWN,
+                    -> TvPlayerKey.ShowControls
+
+                    else -> null
+                }
+                if (key != null && handler(key)) {
+                    return true
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     override fun onUserLeaveHint() {
